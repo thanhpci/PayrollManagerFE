@@ -1,0 +1,19 @@
+.upload-card {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .upload-title {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .ant-upload.ant-upload-drag {
+    border-radius: 4px;
+  }
+  
+  .ant-upload.ant-upload-drag .ant-upload-drag-container {
+    padding: 16px;
+  }
+  

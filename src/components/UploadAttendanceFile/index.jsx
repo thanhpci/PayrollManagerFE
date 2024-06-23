@@ -1,66 +1,78 @@
 import React, { useState } from 'react';
 import { InboxOutlined } from '@ant-design/icons';
-import { Form, message, Upload, DatePicker, Button, Row, Col, Card, Typography } from 'antd';
+import { Form, message, Upload, DatePicker, Button, Card, Typography } from 'antd';
 import axios from 'axios';
+import "./styles.css"
+import { useLoading } from "../../contexts/LoadingContext"; // Import useLoading
 
 const { Dragger } = Upload;
 const { Title } = Typography;
 
 const UploadAttendanceFile = () => {
+  const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
-  const [uploading, setUploading] = useState(false);
+  const { isLoading, setIsLoading } = useLoading(); // Sử dụng useLoading
   const [month, setMonth] = useState(null);
+  const [year, setYear] = useState(null);
 
   const handleUpload = async () => {
-    if (!month || fileList.length === 0) {
-      message.error('Please select a month and upload at least one file.');
+    if (!month || !year || fileList.length === 0) {
+      message.error('Please select a month, year, and upload at least one file.');
       return;
     }
 
     const formData = new FormData();
     fileList.forEach(file => {
-      formData.append('file', file.originFileObj);
+      formData.append('files', file.originFileObj || file);
     });
-    formData.append('month', month.format('YYYY-MM'));
+    formData.append('month', month);
+    formData.append('year', year);
 
-    setUploading(true);
+    setIsLoading(true); // Bật trạng thái loading
 
     try {
-      await axios.post('http://localhost:8000/api/upload_attendance/', formData, {
+      const response = await axios.post('http://localhost:8000/api/upload-attendance-file/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      message.success('Files uploaded successfully');
+      message.success(response.data.message);
+
+      // Reset trạng thái sau khi upload thành công
       setFileList([]);
       setMonth(null);
+      setYear(null);
+      form.resetFields();
     } catch (error) {
-      message.error('Upload failed');
+      if (error.response && error.response.data && error.response.data.error) {
+        message.error(error.response.data.error);
+      } else {
+        message.error('Upload failed');
+      }
     } finally {
-      setUploading(false);
+      setIsLoading(false); // Tắt trạng thái loading
     }
   };
 
   const props = {
-    name: 'file',
+    name: 'files',
     multiple: true,
     fileList,
     beforeUpload: file => {
       setFileList([...fileList, file]);
-      return false; // Prevent automatic upload
+      return false;
     },
     onRemove: file => {
-      setFileList(fileList.filter(item => item.uid !== file.uid));
-    },
-    onDrop(e) {
-      console.log('Dropped files', e.dataTransfer.files);
+      const newFileList = fileList.filter(item => item.uid !== file.uid);
+      setFileList(newFileList);
+      return true;
     },
   };
 
   return (
-    <Card bordered={false} style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
-      <Title level={3} style={{ textAlign: 'center', marginBottom: '20px' }}>Upload Attendance File</Title>
-      <Form layout="vertical" onFinish={handleUpload}>
+    <Card bordered={true} className="upload-card">
+      <Title level={3} className="upload-title">Upload Attendance File</Title>
+      <Form form={form} layout="vertical" onFinish={handleUpload}>
         <Form.Item
           name="month"
           label="Select Month"
@@ -69,7 +81,10 @@ const UploadAttendanceFile = () => {
           <DatePicker
             picker="month"
             style={{ width: '100%' }}
-            onChange={value => setMonth(value)}
+            onChange={(date) => {
+              setMonth(date.month() + 1);
+              setYear(date.year());
+            }}
           />
         </Form.Item>
         <Form.Item
@@ -91,8 +106,8 @@ const UploadAttendanceFile = () => {
           <Button
             type="primary"
             htmlType="submit"
-            loading={uploading}
-            disabled={fileList.length === 0 || !month}
+            loading={isLoading}
+            disabled={fileList.length === 0 || !month || !year}
             style={{ width: '100%' }}
           >
             Upload

@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tag, Input, Row, Col } from "antd";
+import { Table, Input, Row, Col } from "antd";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useLoading } from "../../contexts/LoadingContext";
 import "./styles.css";
 
-
-const EmployeeTable = () => {
+const SalaryTable = () => {
   const [data, setData] = useState([]);
-  const [departments, setDepartments] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -17,17 +16,17 @@ const EmployeeTable = () => {
   const [filters, setFilters] = useState({});
   const [searchText, setSearchText] = useState("");
   const { isLoading, setIsLoading } = useLoading();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
-    fetchDepartments();
   }, [pagination.current, sorter, filters, searchText]);
 
   const fetchData = async () => {
     try {
       setIsLoading(true);
 
-      let query = `http://localhost:8000/api/employees/?page=${pagination.current}&page_size=${pagination.pageSize}`;
+      let query = `http://localhost:8000/api/salaries/?page=${pagination.current}&page_size=${pagination.pageSize}`;
 
       if (searchText) {
         query += `&search=${searchText}`;
@@ -56,18 +55,6 @@ const EmployeeTable = () => {
     }
   };
 
-  const fetchDepartments = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get("http://localhost:8000/api/departments/all/");
-      setDepartments(response.data);
-    } catch (error) {
-      console.error("Error fetching departments:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleTableChange = (pagination, filters, sorter) => {
     setPagination((prevPagination) => ({
       ...prevPagination,
@@ -88,43 +75,43 @@ const EmployeeTable = () => {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "employee_code",
+      title: "Employee Code",
+      dataIndex: ["employee", "employee_code"],
       key: "employee_code",
       sorter: true,
+      render: (text, record) => (
+        <a onClick={() => navigate(`/salary/${record.id}`)}>{text}</a>
+      ),
     },
     {
       title: "Name",
-      dataIndex: "name",
+      dataIndex: ["employee", "name"],
       key: "name",
       sorter: true,
     },
     {
-      title: "Phone",
-      dataIndex: "phone_number",
-      key: "phone_number",
-    },
-    {
-      title: "Date of Birth",
-      dataIndex: "date_of_birth",
-      key: "date_of_birth",
+      title: "Month",
+      dataIndex: "month",
+      key: "month",
       sorter: true,
     },
     {
-      title: "Department",
-      dataIndex: "departments",
-      key: "departments",
-      filters: departments.map((department) => ({
-        text: department.name,
-        value: department.name,
-      })),
-      onFilter: (value, record) => record.departments.some((dep) => dep.name === value),
-      render: (departments) =>
-        departments.map((department) => (
-          <Tag color="blue" key={department.id}>
-            {department.name}
-          </Tag>
-        )),
+      title: "Year",
+      dataIndex: "year",
+      key: "year",
+      sorter: true,
+    },
+    {
+      title: "Total Hours",
+      dataIndex: "total_hours",
+      key: "total_hours",
+      sorter: true,
+    },
+    {
+      title: "Salary",
+      dataIndex: "salary_amount",
+      key: "salary_amount",
+      sorter: true,
     },
   ];
 
@@ -132,11 +119,11 @@ const EmployeeTable = () => {
     <>
       <Row justify="space-between" align="middle" className="search-container">
         <Col>
-          <h2 className="employee-title">Employee List</h2>
+          <h2 className="employee-title">Employee Salaries</h2>
         </Col>
         <Col>
           <Input.Search
-            placeholder="Search employees"
+            placeholder="Search salaries"
             enterButton
             onSearch={handleSearch}
             className="search-input"
@@ -146,10 +133,10 @@ const EmployeeTable = () => {
       <Table
         columns={columns}
         dataSource={data}
-        rowKey="employee_code"
+        rowKey="id"
         pagination={{
           ...pagination,
-          // showTotal: (total) => `Total ${total} items`,
+          showTotal: (total) => `Total ${total} items`,
         }}
         loading={isLoading}
         onChange={handleTableChange}
@@ -158,4 +145,4 @@ const EmployeeTable = () => {
   );
 };
 
-export default EmployeeTable;
+export default SalaryTable;

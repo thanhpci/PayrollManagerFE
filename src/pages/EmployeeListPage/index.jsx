@@ -1,7 +1,7 @@
 import EmployeeTable from '../../components/EmployeeTable'
 import React from 'react';
 
-function EmployeeList() {
+function EmployeeListPage() {
   return (
     <>
       <EmployeeTable></EmployeeTable>
@@ -9,4 +9,4 @@ function EmployeeList() {
   )
 }
 
-export default EmployeeList;
+export default EmployeeListPage;

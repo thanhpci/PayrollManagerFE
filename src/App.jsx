@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import { DesktopOutlined, PieChartOutlined } from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
+import { PieChartOutlined, UploadOutlined, TeamOutlined} from "@ant-design/icons";import { Layout, Menu, theme } from "antd";
 import "./App.css";
-import EmployeeList from "./pages/EmployeeList";
 import logo from "./assets/logo.png";
 
 import { useLoading } from "./contexts/LoadingContext";
 import Loading from "./components/Loading";
-import UploadAttendanceFile from "./components/UploadAttendanceFile";
+import EmployeeListPage from "./pages/EmployeeListPage";
+import UploadPage from "./pages/UploadPage";
+import SalaryListPage from "./pages/SalaryListPage"
+import SalaryDetail from "./components/SalaryDetail";
+
 
 const { Content, Sider } = Layout;
 
@@ -23,8 +25,10 @@ function getItem(label, key, icon, children, link) {
 
 const items = [
   getItem("Home", "1", <PieChartOutlined />, null, "/"),
-  getItem("Employee List", "2", <DesktopOutlined />, null, "/employee-list"),
-  getItem("Upload Attendance File", "3", <DesktopOutlined />, null, "/upload-attendance-file"),
+  getItem("Employee List", "2", <TeamOutlined />, null, "/employee-list-page"),
+  getItem("Upload File", "3", <UploadOutlined />, null, "/upload-page"),
+  getItem("Salary List", "4", <UploadOutlined />, null, "/salary-list-page"),
+
 
 ];
 
@@ -91,8 +95,11 @@ const App = () => {
               >
                 <Routes>
                   <Route path="/" element={<div>Home Page</div>} />
-                  <Route path="/employee-list" element={<EmployeeList />} />
-                  <Route path="/upload-attendance-file" element={<UploadAttendanceFile />} />
+                  <Route path="/employee-list-page" element={<EmployeeListPage />} />
+                  <Route path="/upload-page" element={<UploadPage />} />
+                  <Route path="/salary-list-page" element={<SalaryListPage />} />
+                  <Route path="/salary/:id" element={<SalaryDetail />} />
+
 
                 </Routes>
               </div>

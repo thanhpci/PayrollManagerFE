@@ -1,0 +1,52 @@
+/* SalaryDetail.css */
+.salary-detail-container {
+    padding: 20px;
+    background-color: #f0f2f5;
+    border-radius: 8px;
+  }
+  
+  .salary-detail-wrapper {
+    width: 70%;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .salary-detail-title {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .salary-detail-sections {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    /* gap: 5%; */
+  }
+  
+  .salary-detail-descriptions {
+    padding: 3%;
+    flex: 1;
+  }
+  
+  .salary-detail-descriptions .description-item {
+    padding: 6px 8px !important;
+    margin: 4px 0 !important;
+  }
+  
+  .attendance-records-card {
+    margin-top: 20px;
+  }
+  
+  .attendance-records-title {
+    text-align: center;
+  }
+  
+  .attendance-table {
+    background-color: #fff;
+    padding: 16px;
+    border-radius: 8px;
+  }
+  
