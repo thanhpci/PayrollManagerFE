@@ -1,13 +1,35 @@
-/* SalaryTable.css */
+/* styles.css */
 .search-container {
-    margin-bottom: 16px;
-  }
-  
-  .search-input {
-    width: 300px;
-  }
-  
-  .employee-title {
-    margin-bottom: 0;
-  }
-  
+  margin-bottom: 16px;
+}
+
+.employee-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.search-input {
+  width: 300px;
+}
+
+.ant-table-cell {
+  white-space: pre-wrap;
+  padding: 12px 8px; /* Tăng khoảng cách padding */
+}
+
+.ant-table-row {
+  line-height: 1.5; /* Tăng khoảng cách dòng */
+}
+
+.salary-column {
+  white-space: pre-wrap;
+  max-width: 300px;
+  line-height: 1.5; /* Tăng khoảng cách dòng */
+}
+
+
+.salary-error-message {
+  margin: 12px 0px
+
+}

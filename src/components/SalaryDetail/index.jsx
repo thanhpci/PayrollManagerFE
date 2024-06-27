@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { Descriptions, Table, Card, Spin, Alert } from "antd";
+import { Descriptions, Table, Card, Alert } from "antd";
 import { useLoading } from "../../contexts/LoadingContext";
 import "./styles.css";
 
@@ -34,23 +34,17 @@ const SalaryDetail = () => {
   };
 
   const attendanceColumns = [
-    { title: "Date", dataIndex: "date", key: "date" },
-    { title: "Morning Clock In", dataIndex: "morning_clock_in", key: "morning_clock_in", render: (text) => text || "N/A" },
-    { title: "Morning Clock Out", dataIndex: "morning_clock_out", key: "morning_clock_out", render: (text) => text || "N/A" },
-    { title: "Afternoon Clock In", dataIndex: "afternoon_clock_in", key: "afternoon_clock_in", render: (text) => text || "N/A" },
-    { title: "Afternoon Clock Out", dataIndex: "afternoon_clock_out", key: "afternoon_clock_out", render: (text) => text || "N/A" },
+    { title: "Date", dataIndex: "date", key: "date", align: "center"},
+    { title: "Morning Clock In", dataIndex: "morning_clock_in", key: "morning_clock_in", render: (text) => text || "N/A", align: "center"},
+    { title: "Morning Clock Out", dataIndex: "morning_clock_out", key: "morning_clock_out", render: (text) => text || "N/A", align: "center" },
+    { title: "Afternoon Clock In", dataIndex: "afternoon_clock_in", key: "afternoon_clock_in", render: (text) => text || "N/A", align: "center" },
+    { title: "Afternoon Clock Out", dataIndex: "afternoon_clock_out", key: "afternoon_clock_out", render: (text) => text || "N/A", align: "center" },
   ];
 
   if (!salaryDetail) return null;
 
   return (
     <div className="salary-detail-container">
-      {isLoading ? (
-        <Spin tip="Loading...">
-          <Alert message="Loading data..." type="info" />
-        </Spin>
-      ) : (
-        <>
           <div className="salary-detail-wrapper">
             <h2 className="salary-detail-title">Salary Detail</h2>
             <div className="salary-detail-sections">
@@ -87,9 +81,7 @@ const SalaryDetail = () => {
               pagination={false}
               className="attendance-table"
             />
-          </Card>
-        </>
-      )}
+          </Card>      
     </div>
   );
 };

@@ -43,7 +43,24 @@ const SalaryTable = () => {
       }
 
       const response = await axios.get(query);
-      setData(response.data.results);
+      const salaryData = response.data.results;
+
+      for (let record of salaryData) {
+        if (record.salary_amount === null) {
+          const errorsResponse = await calculateSalary(record.employee.employee_code, record.month, record.year);
+          record.salary_amount = errorsResponse.errors.map(error => (
+            <div className="salary-error" key={error.date}>
+              {error.errors.map((e, index) => (
+                <div key={index} className="salary-error-message">
+                  {`${error.date}\t${e.message}`}
+                </div>
+              ))}
+            </div>
+          ));
+        }
+      }
+
+      setData(salaryData);
       setPagination((prevPagination) => ({
         ...prevPagination,
         total: response.data.count,
@@ -52,6 +69,24 @@ const SalaryTable = () => {
       console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const calculateSalary = async (employee_code, month, year) => {
+    try {
+      const response = await axios.post("http://localhost:8000/api/calculate-salary/", {
+        employee_code,
+        month,
+        year
+      }, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      return response.data;
+    } catch (error) {
+      return error.response.data;
     }
   };
 
@@ -102,16 +137,15 @@ const SalaryTable = () => {
       sorter: true,
     },
     {
-      title: "Total Hours",
-      dataIndex: "total_hours",
-      key: "total_hours",
-      sorter: true,
-    },
-    {
       title: "Salary",
       dataIndex: "salary_amount",
       key: "salary_amount",
       sorter: true,
+      render: (text) => (
+        <div className="salary-column">
+          {text === null ? "N/A" : text}
+        </div>
+      ),
     },
   ];
 
