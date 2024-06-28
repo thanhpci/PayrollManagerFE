@@ -50,3 +50,10 @@
     border-radius: 8px;
   }
   
+
+
+  .error-highlight {
+    color: red;
+    font-weight: bold;
+  }
+  
