@@ -12,9 +12,11 @@
   "dependencies": {
     "antd": "^5.18.1",
     "axios": "^1.7.2",
+    "moment": "^2.30.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.23.1"
+    "react-router-dom": "^6.23.1",
+    "react-svg": "^16.1.34"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

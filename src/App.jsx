@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import { PieChartOutlined, UploadOutlined, TeamOutlined} from "@ant-design/icons";import { Layout, Menu, theme } from "antd";
+import { PieChartOutlined, TeamOutlined, UploadOutlined, DollarOutlined } from '@ant-design/icons';
+
+import { Layout, Menu, theme } from "antd";
 import "./App.css";
 import logo from "./assets/logo.png";
 
@@ -24,10 +26,10 @@ function getItem(label, key, icon, children, link) {
 }
 
 const items = [
-  getItem("Home", "1", <PieChartOutlined />, null, "/"),
+  // getItem("Home", "1", <PieChartOutlined />, null, "/"),
   getItem("Employee List", "2", <TeamOutlined />, null, "/employee-list-page"),
   getItem("Upload File", "3", <UploadOutlined />, null, "/upload-page"),
-  getItem("Salary List", "4", <UploadOutlined />, null, "/salary-list-page"),
+  getItem("Salary List", "4", <DollarOutlined />, null, "/salary-list-page"),
 
 
 ];
@@ -51,9 +53,9 @@ const App = () => {
           }}
         >
           <Sider
-            collapsible
-            collapsed={collapsed}
-            onCollapse={(value) => setCollapsed(value)}
+            // collapsible
+            // collapsed={collapsed}
+            // onCollapse={(value) => setCollapsed(value)}
           >
             <div
               className="logo"

@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Table, Input, Row, Col } from "antd";
+import { Table, Input, Row, Col, Drawer, Button, Form, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useLoading } from "../../contexts/LoadingContext";
 import "./styles.css";
+import iconFilter from "../../assets/icon_filter.svg"; // Đường dẫn đến file SVG
+import { Tooltip } from "antd";
+
+const { Option } = Select;
 
 const SalaryTable = () => {
   const [data, setData] = useState([]);
@@ -15,8 +19,13 @@ const SalaryTable = () => {
   const [sorter, setSorter] = useState({});
   const [filters, setFilters] = useState({});
   const [searchText, setSearchText] = useState("");
+  const [filterDrawerVisible, setFilterDrawerVisible] = useState(false);
+  const [filterForm] = Form.useForm();
   const { isLoading, setIsLoading } = useLoading();
   const navigate = useNavigate();
+
+  const [months, setMonths] = useState([]);
+  const [years, setYears] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -33,7 +42,9 @@ const SalaryTable = () => {
       }
 
       if (sorter.field) {
-        query += `&ordering=${sorter.order === "descend" ? "-" : ""}${sorter.field}`;
+        query += `&ordering=${sorter.order === "descend" ? "-" : ""}${
+          sorter.field
+        }`;
       }
 
       for (const key in filters) {
@@ -47,8 +58,12 @@ const SalaryTable = () => {
 
       for (let record of salaryData) {
         if (record.salary_amount === null) {
-          const errorsResponse = await calculateSalary(record.employee.employee_code, record.month, record.year);
-          record.salary_amount = errorsResponse.errors.map(error => (
+          const errorsResponse = await calculateSalary(
+            record.employee.employee_code,
+            record.month,
+            record.year
+          );
+          record.salary_amount = errorsResponse.errors.map((error) => (
             <div className="salary-error" key={error.date}>
               {error.errors.map((e, index) => (
                 <div key={index} className="salary-error-message">
@@ -72,17 +87,48 @@ const SalaryTable = () => {
     }
   };
 
+  useEffect(() => {
+    fetchMonths();
+    fetchYears();
+  }, []);
+
+  const fetchMonths = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/salary/available-months/"
+      );
+      setMonths(response.data.months);
+    } catch (error) {
+      console.error("Error fetching months:", error);
+    }
+  };
+
+  const fetchYears = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/salary/available-years/"
+      );
+      setYears(response.data.years);
+    } catch (error) {
+      console.error("Error fetching years:", error);
+    }
+  };
+
   const calculateSalary = async (employee_code, month, year) => {
     try {
-      const response = await axios.post("http://localhost:8000/api/calculate-salary/", {
-        employee_code,
-        month,
-        year
-      }, {
-        headers: {
-          "Content-Type": "application/json"
+      const response = await axios.post(
+        "http://localhost:8000/api/calculate-salary/",
+        {
+          employee_code,
+          month,
+          year,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
 
       return response.data;
     } catch (error) {
@@ -106,6 +152,15 @@ const SalaryTable = () => {
       ...prevPagination,
       current: 1, // Reset to the first page
     }));
+  };
+
+  const handleFilter = (values) => {
+    setFilters(values);
+    setPagination((prevPagination) => ({
+      ...prevPagination,
+      current: 1,
+    }));
+    setFilterDrawerVisible(false);
   };
 
   const columns = [
@@ -142,9 +197,7 @@ const SalaryTable = () => {
       key: "salary_amount",
       sorter: true,
       render: (text) => (
-        <div className="salary-column">
-          {text === null ? "N/A" : text}
-        </div>
+        <div className="salary-column">{text === null ? "N/A" : text}</div>
       ),
     },
   ];
@@ -156,25 +209,67 @@ const SalaryTable = () => {
           <h2 className="employee-title">Employee Salaries</h2>
         </Col>
         <Col>
-          <Input.Search
-            placeholder="Search salaries"
-            enterButton
-            onSearch={handleSearch}
-            className="search-input"
-          />
+          <Row>
+            <Tooltip title="Filter">
+              <div className="filter-icon-container">
+                <img
+                  src={iconFilter}
+                  className="filter-icon"
+                  onClick={() => setFilterDrawerVisible(true)}
+                />
+              </div>
+            </Tooltip>
+            <Input.Search
+              placeholder="Search salaries"
+              enterButton
+              onSearch={handleSearch}
+              className="search-input"
+            />
+          </Row>
         </Col>
       </Row>
+
       <Table
         columns={columns}
         dataSource={data}
         rowKey="id"
         pagination={{
           ...pagination,
-          showTotal: (total) => `Total ${total} items`,
+          // showTotal: (total) => `Total ${total} items`,
         }}
         loading={isLoading}
         onChange={handleTableChange}
       />
+      <Drawer
+        title="Filter Salaries"
+        width={360}
+        onClose={() => setFilterDrawerVisible(false)}
+        visible={filterDrawerVisible}
+      >
+        <Form form={filterForm} layout="vertical" onFinish={handleFilter}>
+          <Form.Item name="month" label="Month">
+            <Select placeholder="Select a month" allowClear>
+              {months.map((month) => (
+                <Option key={month} value={month}>
+                  {month}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item name="year" label="Year">
+            <Select placeholder="Select a year" allowClear>
+              {years.map((year) => (
+                <Option key={year} value={year}>
+                  {year}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Button type="primary" htmlType="submit">
+            Apply Filters
+          </Button>
+        </Form>
+      </Drawer>
     </>
   );
 };
