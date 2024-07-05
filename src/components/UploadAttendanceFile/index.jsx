@@ -3,7 +3,7 @@ import { InboxOutlined } from '@ant-design/icons';
 import { Form, message, Upload, DatePicker, Button, Card, Typography } from 'antd';
 import axios from 'axios';
 import "./styles.css"
-import { useLoading } from "../../contexts/LoadingContext"; // Import useLoading
+import { useLoading } from "../../contexts/LoadingContext";
 
 const { Dragger } = Upload;
 const { Title } = Typography;
@@ -11,7 +11,7 @@ const { Title } = Typography;
 const UploadAttendanceFile = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
-  const { isLoading, setIsLoading } = useLoading(); // Sử dụng useLoading
+  const { isLoading, setIsLoading } = useLoading();
   const [month, setMonth] = useState(null);
   const [year, setYear] = useState(null);
 
@@ -28,8 +28,7 @@ const UploadAttendanceFile = () => {
     formData.append('month', month);
     formData.append('year', year);
 
-    setIsLoading(true); // Bật trạng thái loading
-
+    setIsLoading(true);
     try {
       const response = await axios.post('http://localhost:8000/api/upload-attendance-file/', formData, {
         headers: {
@@ -38,7 +37,6 @@ const UploadAttendanceFile = () => {
       });
       message.success(response.data.message);
 
-      // Reset trạng thái sau khi upload thành công
       setFileList([]);
       setMonth(null);
       setYear(null);
@@ -50,7 +48,7 @@ const UploadAttendanceFile = () => {
         message.error('Upload failed');
       }
     } finally {
-      setIsLoading(false); // Tắt trạng thái loading
+      setIsLoading(false);
     }
   };
 

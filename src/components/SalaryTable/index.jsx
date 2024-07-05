@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useLoading } from "../../contexts/LoadingContext";
 import "./styles.css";
-import iconFilter from "../../assets/icon_filter.svg"; // Đường dẫn đến file SVG
+import iconFilter from "../../assets/icon_filter.svg";
 import { Tooltip } from "antd";
 import { DownloadOutlined } from '@ant-design/icons';
 

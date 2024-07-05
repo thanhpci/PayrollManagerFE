@@ -181,11 +181,10 @@ const SalaryDetail = () => {
       .get(
         `http://localhost:8000/api/export_employee_salary_report/${salaryDetail.employee.employee_code}/${salaryDetail.month}/${salaryDetail.year}/`,
         {
-          responseType: "blob", // Để xử lý phản hồi là dữ liệu nhị phân
+          responseType: "blob",
         }
       )
       .then((response) => {
-        // Tạo một Blob từ dữ liệu phản hồi
         const blob = new Blob([response.data], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
