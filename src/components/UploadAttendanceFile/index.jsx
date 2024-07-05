@@ -59,7 +59,7 @@ const UploadAttendanceFile = () => {
     multiple: true,
     fileList,
     beforeUpload: file => {
-      setFileList([...fileList, file]);
+      setFileList(prevList => [...prevList, file]);
       return false;
     },
     onRemove: file => {

@@ -57,3 +57,17 @@
     font-weight: bold;
   }
   
+
+
+  .not-answered-time {
+    /* Định kiểu tùy chỉnh cho các phần tử không có câu trả lời thời gian */
+    color: rgb(188, 188, 96);
+    font-style: italic;
+  }
+
+  .export-detail-button-wrapper {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    margin-bottom: -45px;
+  }

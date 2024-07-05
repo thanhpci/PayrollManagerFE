@@ -6,6 +6,8 @@ import { useLoading } from "../../contexts/LoadingContext";
 import "./styles.css";
 import iconFilter from "../../assets/icon_filter.svg"; // Đường dẫn đến file SVG
 import { Tooltip } from "antd";
+import { DownloadOutlined } from '@ant-design/icons';
+
 
 const { Option } = Select;
 
@@ -26,6 +28,7 @@ const SalaryTable = () => {
 
   const [months, setMonths] = useState([]);
   const [years, setYears] = useState([]);
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -47,9 +50,21 @@ const SalaryTable = () => {
         }`;
       }
 
+      // for (const key in filters) {
+      //   if (filters[key]) {
+      //     query += `&${key}=${filters[key]}`;
+      //   }
+      // }
+
       for (const key in filters) {
         if (filters[key]) {
-          query += `&${key}=${filters[key]}`;
+          if (Array.isArray(filters[key])) {
+            filters[key].forEach((value) => {
+              query += `&${key}=${value}`;
+            });
+          } else {
+            query += `&${key}=${filters[key]}`;
+          }
         }
       }
 
@@ -90,6 +105,7 @@ const SalaryTable = () => {
   useEffect(() => {
     fetchMonths();
     fetchYears();
+    fetchDepartments();
   }, []);
 
   const fetchMonths = async () => {
@@ -114,6 +130,17 @@ const SalaryTable = () => {
     }
   };
 
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/departments/all/"
+      );
+      setDepartments(response.data);
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  };
+
   const calculateSalary = async (employee_code, month, year) => {
     try {
       const response = await axios.post(
@@ -133,6 +160,34 @@ const SalaryTable = () => {
       return response.data;
     } catch (error) {
       return error.response.data;
+    }
+  };
+
+
+  const exportToExcel = async () => {
+    try {
+      let query = `http://localhost:8000/api/export_salary_summary/`;
+
+      if (filters.month) {
+        query += `?month=${filters.month}`;
+      }
+      if (filters.year) {
+        query += `${filters.month ? "&" : "?"}year=${filters.year}`;
+      }
+      if (filters.department) {
+        query += `${filters.month || filters.year ? "&" : "?"}department=${filters.department}`;
+      }
+
+      const response = await axios.get(query, {
+        responseType: "blob",
+      });
+
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, `Salary_Summary_${filters.month || ""}_${filters.year || ""}.xlsx`);
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
     }
   };
 
@@ -180,6 +235,18 @@ const SalaryTable = () => {
       sorter: true,
     },
     {
+      title: "Department",
+      dataIndex: ["employee", "departments"],
+      key: "departments",
+      render: (departments) => (
+        <>
+          {departments.map((dept) => (
+            <div key={dept.id}>{dept.name}</div>
+          ))}
+        </>
+      ),
+    },
+    {
       title: "Month",
       dataIndex: "month",
       key: "month",
@@ -204,10 +271,19 @@ const SalaryTable = () => {
 
   return (
     <>
+      <Row justify="center" align="middle">
+        <h2 className="employee-title">Employee Salaries</h2>
+      </Row>
       <Row justify="space-between" align="middle" className="search-container">
-        <Col>
-          <h2 className="employee-title">Employee Salaries</h2>
-        </Col>
+        <Button
+          type="primary"
+          onClick={exportToExcel}
+          ghost="true"
+        >
+        <DownloadOutlined />
+          Export to File
+        </Button>
+
         <Col>
           <Row>
             <Tooltip title="Filter">
@@ -237,6 +313,7 @@ const SalaryTable = () => {
           ...pagination,
           // showTotal: (total) => `Total ${total} items`,
         }}
+        cellPaddingBlock="100px"
         loading={isLoading}
         onChange={handleTableChange}
       />
@@ -265,6 +342,17 @@ const SalaryTable = () => {
               ))}
             </Select>
           </Form.Item>
+
+          <Form.Item name="department" label="Department">
+            <Select placeholder="Select a department" allowClear>
+              {departments.map((dept) => (
+                <Option key={dept.id} value={dept.id}>
+                  {dept.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
           <Button type="primary" htmlType="submit">
             Apply Filters
           </Button>
